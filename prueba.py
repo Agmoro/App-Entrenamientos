@@ -22,27 +22,6 @@ print("hola que tal")
 contar = 0
 
 
-def Arbolito():
-    global contar
-    valores = []
-
-    for i in range(6):
-        valores.clear()
-        for j in range(6):
-            valores.append(random.randint(1, 500))
-
-        arbol.insert(
-            parent="",
-            index="end",
-            iid=contar,
-            text="",
-            values=valores,
-        )
-        contar += 1
-
-    return contar
-
-
 et1 = ttk.Label(root, text="Hola, es una prueba", style="BW.TLabel")
 et1.pack()
 
@@ -53,10 +32,7 @@ style2.map(
     background=[("pressed", "!disabled", "black"), ("active", "white")],
 )
 
-colored_btn = ttk.Button(
-    text="llenar tabla", style="C.TButton", command=lambda: Arbolito()
-)
-colored_btn.pack(side="top")
+
 colored_btn2 = ttk.Button(
     text="poner tabla", style="C.TButton", command=lambda: Ponerarbol()
 )
