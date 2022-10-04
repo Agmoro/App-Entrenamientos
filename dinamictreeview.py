@@ -1,11 +1,50 @@
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
-from aux_functions import Ancho_Columna
+
 
 root = tk.Tk()
 workbook = pd.ExcelFile("Cursos-DB.xlsx")
-df_cursos = pd.read_excel(workbook, "Empleados")
+df_cursos = pd.read_excel(workbook, "Cursos")
+df_empleados = pd.read_excel(workbook, "Empleados")
+
+
+def Ancho_Columna(df):
+    len_col = {"": 0}
+    for column in df:
+        headcount = 0
+        col_element_list = df[column]
+        charcount = 0
+        headuppcount = 0
+        headlowcount = 0
+        for character in str(column):
+            if character.isupper() or character.isnumeric():
+                headuppcount += 4
+            elif character.islower() or character.isdigit():
+                headlowcount += 3
+        headcount = headuppcount + headlowcount
+
+        for element in col_element_list:
+            uppernumcount = 0
+            lowercount = 0
+            charcount_temp = 0
+
+            for character in str(element):
+                if character.isupper() or character.isnumeric():
+                    uppernumcount += 4
+                elif character.islower() or character.isdigit():
+                    lowercount += 3
+            charcount_temp = lowercount + uppernumcount
+            if charcount_temp > charcount:
+                charcount = charcount_temp
+        if headcount > charcount:
+            headict = {column: headcount}
+            len_col |= headict
+        else:
+            charcountdict = {column: charcount}
+            len_col |= charcountdict
+
+    return len_col
 
 
 def InsertTree(root, df, row, column):
@@ -22,7 +61,7 @@ def InsertTree(root, df, row, column):
     anchocol = Ancho_Columna(df)
     df_rows = df.to_numpy().tolist()
     for i in cols:
-        tree.column(i, width=anchocol.get(i) * 9, stretch=False, anchor="w")
+        tree.column(i, width=anchocol.get(i) * 3, stretch=False, anchor="w")
         tree.heading(i, text=i, anchor="w")
     for row in df_rows:
         tree.insert("", "end", values=row)
@@ -42,7 +81,7 @@ treebutton = tk.Button(
     root, text="Cursos", command=lambda: InsertTree(root, df_cursos, 1, 2)
 )
 treebutton2 = tk.Button(
-    root, text="Empleados", command=lambda: InsertTree(root, df_cursos, 1, 2)
+    root, text="Empleados", command=lambda: InsertTree(root, df_empleados, 1, 2)
 )
 treebutton3 = tk.Button(root, text="Borrar")
 treebutton2.grid(row=2, column=1)
