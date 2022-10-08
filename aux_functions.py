@@ -85,7 +85,7 @@ class Auxiliary:
         scroll_h_arbol.config(command=self.arbol.xview)
 
     def clicker(self, e):
-        self.cursoval.set("")
         selected = self.arbol.focus()
         values = self.arbol.item(selected, "values")
         self.cursoval.set(values[0])
+        return self.cursoval.get()

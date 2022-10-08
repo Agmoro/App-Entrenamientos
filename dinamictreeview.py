@@ -67,7 +67,7 @@ def InsertTree(root, df, row, column):
         tree.insert("", "end", values=row)
     # for index, row in df.iterrows():
     #     tree.insert("", 0, text=index, values=list(row))
-    tree.column("#0", width=20)  # manera de que la justificacion de columnas funcione
+    tree.column("#0", width=0)  # manera de que la justificacion de columnas funcione
     scroll_y_arbol.config(command=tree.yview)
     scroll_h_arbol.config(command=tree.xview)
 

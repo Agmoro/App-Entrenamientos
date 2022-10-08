@@ -1,9 +1,10 @@
+from tkinter import N, IntVar, Text, messagebox
 import pandas as pd
 import tkinter as tk
 from tkinter import END, ttk
 from aux_functions import Auxiliary
 from tkcalendar import DateEntry
-from tkinter import StringVar
+from tkinter import StringVar, IntVar
 
 
 root = tk.Tk()
@@ -15,14 +16,16 @@ style.theme_use("vista")
 # Toma de datos desde excel
 workbook = pd.ExcelFile("Cursos-DB.xlsx")
 df_cursos = pd.read_excel(workbook, "Cursos")
-df_pasl = pd.read_excel(workbook, "PASL")
-df_empleados = pd.read_excel(workbook, "Empleados")[
+df_pasl = pd.read_excel(workbook, "PASL", index_col=False)
+df_empleados = pd.read_excel(workbook, "Empleados", index_col=False)[
     ["Legajo", "Nombre", "Apellido"]
-]  # ya se lo deja listo para usar
+]
+df_buscaremp = pd.read_excel(workbook, "Empleados", index_col=False)
+df_buscaremp = df_buscaremp.astype({"Linea": str, "Legajo": str})
 
 
 # Generacion de datos con los que trabajar
-seleccion_curso = df_cursos[["ID-Curso", "Titulo"]]
+seleccion_curso = df_cursos[["IDCurso", "Titulo"]]
 seleccion_area = df_pasl["Area"].dropna().drop_duplicates().to_numpy().tolist()
 seleccion_sector = df_pasl["Sector"].dropna().drop_duplicates().to_numpy().tolist()
 
@@ -110,19 +113,47 @@ treeframeemp.grid(row=8, column=2, rowspan=8, pady=4)
 treeemp.bind("<Double-1>", auxiliaremp.clicker)
 
 # Textbox para registrar legajos adicionales
+legtextbox = tk.Text(root, width=25, height=8, borderwidth=1)
+
+
 def textbox():
-    global legtextbox
-    legtextbox = tk.Text(root, width=25, height=8, borderwidth=1)
     legtextbox.grid(row=8, column=0, columnspan=2, padx=4)
 
 
-# Traceback del trace
+# Traceback del trace de legval
 def writetextbox(*args):
     legtextbox.insert(END, f"{legval.get()} ")
 
 
-# Trace de legval
+def asociados(*args):
+    emp_asociados = df_cursos.set_index("IDCurso")
+    emp_asociados = emp_asociados[
+        emp_asociados.columns.difference(
+            [
+                "Titulo",
+                "Descripcion",
+                "Calificacion que genera",
+                "Periodico?",
+                "Frecuencia",
+                "Instructor_1",
+                "Instructor_2",
+                "Instructor_3",
+                "Instructor_4",
+            ],
+            sort=False,
+        )
+    ]
+    emp_asociados = emp_asociados.transpose()
+    emp_asociados.drop(
+        emp_asociados[emp_asociados[cursoval.get()] == False].index, inplace=True
+    )
+    emp_asociados = emp_asociados.index.values.tolist()
+    print(emp_asociados)
+
+
+# Trace de legval y cursoval
 legval.trace_add("write", writetextbox)
+cursoval.trace_add("write", asociados)
 
 # Frame de botones
 botonframe = tk.Frame(root)
@@ -143,6 +174,37 @@ extraleg_b = ttk.Button(botonframe, text="Legajos Adicionales")
 def disablebut():
     extraleg_b.config(state="disable")
 
+
+def carga():
+    confirmation = messagebox.askokcancel(
+        "Confirmacion",
+        message=f"Estas seguro de cargar estos datos?\n\n"
+        + f"Curso: {cursoval.get()}\n"
+        + f"Area: {areaval.get()}\n"
+        + f"Sector: {sectorval.get()}\n"
+        + f"Puesto: {puestoval.get()}\n"
+        + f"Linea: {lineaval.get()}\n"
+        + f"Legajos adicionales: {legtextbox.get('1.0', 'end-1c').split()}",
+    )
+    if confirmation == True:
+        if areaval.get() != "Todos":
+            emp = df_buscaremp[
+                (df_buscaremp.Area == areaval.get())
+                | (df_buscaremp.Sector == sectorval.get())
+                | (df_buscaremp.Puesto == puestoval.get())
+                | (df_buscaremp.Linea == lineaval.get())
+            ]
+            emplist = emp["Legajo"].tolist()
+        elif areaval.get() == "Todos":
+            emplist = df_buscaremp["Legajo"].tolist()
+        else:
+            messagebox.askokcancel("ERROR!", "Se ha producido un error.")
+        # if legtextbox.get("1.0", "end-1c") != " ":
+        boxtextlist = legtextbox.get("1.0", "end-1c").split()
+        empboxlist = list(set(emplist + boxtextlist))
+
+
+cargar_b.configure(command=lambda: carga())
 
 extraleg_b.config(command=lambda: [auxiliaremp.InsertTree(), textbox(), disablebut()])
 extraleg_b.pack(side="right", pady=3, padx=4)
