@@ -3,6 +3,8 @@ import pandas as pd
 
 workbook = pd.ExcelFile("Cursos-DB.xlsx")
 df = pd.read_excel(workbook, "Empleados")
+superdick= {"pene":8, "toro":2, "lala":56, "meme": 45, "consizo": 33, "nada que ver": 99, "lista infinita": 22, "sigue la joda": 33}
+
 
 
 def Ancho_Columna(df):

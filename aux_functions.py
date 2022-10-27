@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-import pandas as pd
 
 
 class Auxiliary:
@@ -54,10 +53,10 @@ class Auxiliary:
             # count pass to dict
             if headcount > charcount:
                 headict = {column: headcount}
-                len_col |= headict
+                len_col.update(headict)
             else:
                 charcountdict = {column: charcount}
-                len_col |= charcountdict
+                len_col.update(charcountdict)
 
         return len_col
 

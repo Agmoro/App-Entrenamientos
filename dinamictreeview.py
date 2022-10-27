@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 import pandas as pd
 
-
 root = tk.Tk()
 workbook = pd.ExcelFile("Cursos-DB.xlsx")
 df_cursos = pd.read_excel(workbook, "Cursos")
@@ -39,10 +38,10 @@ def Ancho_Columna(df):
                 charcount = charcount_temp
         if headcount > charcount:
             headict = {column: headcount}
-            len_col |= headict
+            len_col.update(headict)
         else:
             charcountdict = {column: charcount}
-            len_col |= charcountdict
+            len_col.update(charcountdict)
 
     return len_col
 
@@ -67,7 +66,8 @@ def InsertTree(root, df, row, column):
         tree.insert("", "end", values=row)
     # for index, row in df.iterrows():
     #     tree.insert("", 0, text=index, values=list(row))
-    tree.column("#0", width=0)  # manera de que la justificacion de columnas funcione
+    tree.column("#0",
+                width=0)  # manera de que la justificacion de columnas funcione
     scroll_y_arbol.config(command=tree.yview)
     scroll_h_arbol.config(command=tree.xview)
 
@@ -77,16 +77,15 @@ def BorrarArbol(widget):
     root.update()
 
 
-treebutton = tk.Button(
-    root, text="Cursos", command=lambda: InsertTree(root, df_cursos, 1, 2)
-)
-treebutton2 = tk.Button(
-    root, text="Empleados", command=lambda: InsertTree(root, df_empleados, 1, 2)
-)
+treebutton = tk.Button(root,
+                       text="Cursos",
+                       command=lambda: InsertTree(root, df_cursos, 1, 2))
+treebutton2 = tk.Button(root,
+                        text="Empleados",
+                        command=lambda: InsertTree(root, df_empleados, 1, 2))
 treebutton3 = tk.Button(root, text="Borrar")
 treebutton2.grid(row=2, column=1)
 treebutton3.grid(row=3, column=1)
 treebutton.grid(row=1, column=1)
-
 
 root.mainloop()
